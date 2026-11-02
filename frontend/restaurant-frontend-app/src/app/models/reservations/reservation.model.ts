@@ -42,6 +42,7 @@ export interface ReservationCustomer {
   hasSubmittedPreOrder?: boolean;
   preOrder?: Order;
   preOrders?: Order[];
+  guestInviteLinkAvailable?: boolean;
   createdByName?: string;
   createdByRole?: 'Customer' | 'Waiter';
 }

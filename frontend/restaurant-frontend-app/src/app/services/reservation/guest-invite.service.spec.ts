@@ -32,8 +32,20 @@ describe('GuestInviteService', () => {
 
     const req = httpMock.expectOne(`${BASE_URL}/reservations/res-1/invite-token`);
     expect(req.request.method).toBe('GET');
-    req.flush({ token: 'abc123xyz' });
-    expect(result).toEqual({ token: 'abc123xyz' });
+    const response: GroupInviteToken = {
+      token: 'abc123xyz',
+      groupReservationId: 'group-1',
+      locationId: 'location-1',
+      restaurantName: 'Green & Tasty',
+      locationAddress: '48 Rustaveli Avenue',
+      startTime: '2026-10-17T12:00:00Z',
+      endTime: '2026-10-17T14:00:00Z',
+      maxGuestCount: 2,
+      tableNumber: 3,
+      inviterName: 'Kateryna',
+    };
+    req.flush(response);
+    expect(result).toEqual(response);
   });
 
   it('encodes the reservation id when requesting the invite token', () => {

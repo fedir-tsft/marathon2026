@@ -11,16 +11,17 @@ import { AuthenticationService } from './services/authentication.service';
 import { SKIP_ERROR_TOAST } from './skip-error-toast.context';
 import { getServerErrorMessage } from '../shared/helpers/http-error-helpers';
 
+const isGuestFlowEndpoint = (url: string): boolean =>
+  /\/guest\/sessions(?:\/|$)/.test(url) || /\/guest\/invites\//.test(url);
+
 export const tokenInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
   next: HttpHandlerFn
 ) => {
   const toastr = inject(ToastService);
 
-  // IMPORTANT: do not modify Guest endpoints at all.
-  // Guest flow uses a different token (guest session token) and we must not touch the body.
-  // Otherwise we break POST /guest/sessions payload.
-  if (req.url.includes('/guest/')) {
+  // Guest session requests use their own token; owner-only group endpoints use Cognito auth.
+  if (isGuestFlowEndpoint(req.url)) {
     return next(req).pipe(
       catchError((error: HttpErrorResponse) => {
         console.log(error);

@@ -1,5 +1,6 @@
+import { By } from '@angular/platform-browser';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { CardReservationComponent } from './card-reservation.component';
 import { API_BASE_URL } from '@app/shared/config/api-base-url.token';
 import { ReservationCustomer, ReservationStatusCustomer } from '@app/models/reservations/reservation.model';
@@ -35,5 +36,48 @@ describe('CardReservationComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('shows Group Order for an open group reservation', () => {
+    fixture.componentRef.setInput('r', {
+      ...RESERVATION,
+      guestInviteLinkAvailable: true,
+    });
+    fixture.detectChanges();
+
+    const groupOrderButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((button) => button.nativeElement.textContent.trim() === 'Group Order');
+
+    expect(groupOrderButton).toBeDefined();
+  });
+
+  it('navigates to the reservation group-order route', () => {
+    fixture.componentRef.setInput('r', {
+      ...RESERVATION,
+      guestInviteLinkAvailable: true,
+    });
+    fixture.detectChanges();
+    const router = TestBed.inject(Router);
+    const navigateSpy = spyOn(router, 'navigate').and.resolveTo(true);
+
+    component.onGroupOrder();
+
+    expect(navigateSpy).toHaveBeenCalledWith([
+      '/reservations',
+      RESERVATION.id,
+      'group-order',
+    ]);
+  });
+
+  it('does not show Group Order when the group invite is unavailable', () => {
+    fixture.componentRef.setInput('r', RESERVATION);
+    fixture.detectChanges();
+
+    const groupOrderButton = fixture.debugElement
+      .queryAll(By.css('button'))
+      .find((button) => button.nativeElement.textContent.trim() === 'Group Order');
+
+    expect(groupOrderButton).toBeUndefined();
   });
 });

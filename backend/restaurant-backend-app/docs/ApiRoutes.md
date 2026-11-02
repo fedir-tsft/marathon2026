@@ -520,10 +520,21 @@ Response: `200 OK`
 ```
 
 ### `GET` /reservations/{reservationId}/invite-token
+Owner-authenticated. Returns the invite token and group details for the owner view, including when the guest capacity is full.
+
 Response: `200 OK`
 ```json
 {
-  "token": "string"
+  "token": "string",
+  "groupReservationId": "string",
+  "locationId": "string",
+  "restaurantName": "string",
+  "locationAddress": "string",
+  "startTime": "2026-08-07T19:00:00Z",
+  "endTime": "2026-08-07T20:30:00Z",
+  "maxGuestCount": 4,
+  "tableNumber": 1,
+  "inviterName": "string"
 }
 ```
 

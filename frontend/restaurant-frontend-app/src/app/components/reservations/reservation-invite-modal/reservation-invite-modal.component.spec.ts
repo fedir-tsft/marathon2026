@@ -39,7 +39,20 @@ describe('ReservationInviteModalComponent', () => {
     guestInviteService = jasmine.createSpyObj<GuestInviteService>('GuestInviteService', [
       'getInviteToken$',
     ]);
-    guestInviteService.getInviteToken$.and.returnValue(of({ token: 'abc123xyz' }));
+    guestInviteService.getInviteToken$.and.returnValue(
+      of({
+        token: 'abc123xyz',
+        groupReservationId: 'group-1',
+        locationId: 'location-1',
+        restaurantName: 'Green & Tasty',
+        locationAddress: '48 Rustaveli Avenue',
+        startTime: '2026-10-17T12:00:00Z',
+        endTime: '2026-10-17T14:00:00Z',
+        maxGuestCount: 2,
+        tableNumber: 3,
+        inviterName: 'Kateryna',
+      })
+    );
 
     await TestBed.configureTestingModule({
       imports: [ReservationInviteModalComponent],

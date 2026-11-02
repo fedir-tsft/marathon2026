@@ -39,7 +39,18 @@ export const groupOrdersMockInterceptor: HttpInterceptorFn = (req, next) => {
     );
 
   if (req.method === 'GET' && path.endsWith(`/reservations/${DEMO_RESERVATION_ID}/invite-token`)) {
-    return respond(() => ({ token: DEMO_INVITE_TOKEN }));
+    return respond(() => ({
+      token: DEMO_INVITE_TOKEN,
+      groupReservationId: DEMO_INVITE.GroupReservationId,
+      locationId: DEMO_INVITE.LocationId,
+      restaurantName: DEMO_INVITE.RestaurantName,
+      locationAddress: DEMO_INVITE.LocationAddress,
+      startTime: DEMO_INVITE.StartTime,
+      endTime: DEMO_INVITE.EndTime,
+      maxGuestCount: store.maxCapacity,
+      tableNumber: DEMO_INVITE.TableNumber,
+      inviterName: DEMO_INVITE.InviterName,
+    }));
   }
   if (req.method === 'GET' && path.endsWith(`/guest/invites/${DEMO_INVITE_TOKEN}`)) {
     return respond(() => ({ ...DEMO_INVITE, MaxGuestCount: store.maxCapacity }));

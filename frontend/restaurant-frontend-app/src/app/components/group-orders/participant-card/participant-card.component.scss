@@ -1,0 +1,123 @@
+@use 'app/shared/styles/abstracts/colors' as color;
+
+.card {
+  min-width: 0;
+  padding: clamp(14px, 3vw, 20px);
+  border-radius: 14px;
+  background: color.$neutral-0;
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  > div {
+    display: grid;
+    justify-items: start;
+    gap: 8px;
+    min-width: 0;
+  }
+}
+
+.title {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: color.$neutral-900;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+.submitted {
+  background: color.$green-100;
+  color: color.$green-800;
+}
+
+.pending {
+  background: color.$orange-100;
+  color: color.$neutral-900;
+}
+
+.remove-link {
+  flex: 0 0 auto;
+  font-size: 0.875rem;
+}
+
+.items {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid color.$neutral-100;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: color.$green-100;
+}
+
+.initial {
+  display: grid;
+  place-items: center;
+  color: color.$green-800;
+}
+
+.name {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: color.$neutral-900;
+}
+
+.qty,
+.price {
+  margin: 0;
+  white-space: nowrap;
+  color: color.$neutral-700;
+}
+
+.empty {
+  margin: 12px 0;
+  color: color.$neutral-600;
+}
+
+.subtotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 0 0;
+  color: color.$neutral-900;
+  font-weight: 600;
+}
+
+@media (max-width: 375px) {
+  .item {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    column-gap: 8px;
+  }
+
+  .price {
+    grid-column: 2 / -1;
+    justify-self: end;
+  }
+}

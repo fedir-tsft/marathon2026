@@ -12,4 +12,13 @@ export interface GuestInvite {
 
 export interface GroupInviteToken {
   token: string;
+  groupReservationId: string;
+  locationId: string;
+  restaurantName: string;
+  locationAddress: string;
+  startTime: string;
+  endTime: string;
+  maxGuestCount: number;
+  tableNumber: number;
+  inviterName: string;
 }

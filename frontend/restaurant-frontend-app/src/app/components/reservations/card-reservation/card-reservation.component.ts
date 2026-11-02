@@ -136,6 +136,16 @@ export class CardReservationComponent {
     );
   });
 
+  readonly canOpenGroupOrder = computed(() => {
+    const reservation = this.r();
+    return (
+      this.role() === Roles.CUSTOMER &&
+      reservation.status === ReservationStatusCustomer.Reserved &&
+      reservation.guestCount > 1 &&
+      reservation.guestInviteLinkAvailable === true
+    );
+  });
+
   readonly isAnonymous = computed(() => {
     return !this.r().customerId;
   });
@@ -173,6 +183,12 @@ export class CardReservationComponent {
       queryParams,
     });
   }
+
+  onGroupOrder(): void {
+    if (!this.canOpenGroupOrder()) return;
+    void this.router.navigate(['/reservations', this.r().id, 'group-order']);
+  }
+
   onPreOrderWaiter(): void {
     if (this.preOrderItemCount() > 0) {
       this.navigateToWaiterPreOrder();

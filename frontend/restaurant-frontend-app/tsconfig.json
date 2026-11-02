@@ -29,5 +29,6 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "controlFlow": true
-  }
+  },
+  "exclude": ["homework-tests"]
 }

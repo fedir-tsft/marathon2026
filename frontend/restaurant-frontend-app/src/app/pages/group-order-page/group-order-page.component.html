@@ -1,0 +1,146 @@
+@if (isLoading()) {
+  <main class="state-page" role="status" aria-live="polite">
+    <p>Loading group pre-order…</p>
+  </main>
+} @else if (errorMessage()) {
+  <main class="state-page error-state">
+    <h1>{{ errorMessage() }}</h1>
+    <button class="button button--primary" type="button" (click)="loadGroup()">Try again</button>
+  </main>
+} @else if (invite(); as groupInvite) {
+  <main class="group-order-page">
+    <header class="page-header">
+      <div class="title-row">
+        <h1>Group Pre-Order</h1>
+        @if (statusLabel()) {
+          <span
+            class="status-badge"
+            [class.status-badge--submitted]="groupStatus()?.status === 'Submitted'"
+          >
+            {{ statusLabel() }}
+          </span>
+        }
+      </div>
+
+      <div class="reservation-details">
+        <span>{{ groupInvite.LocationAddress }}</span>
+        <span>{{ groupInvite.StartTime | date: 'MMM d, y' }}</span>
+        <span>{{ groupInvite.StartTime | date: 'HH:mm' }} - {{ groupInvite.EndTime | date: 'HH:mm' }}</span>
+        <span>{{ groupStatus()?.currentParticipants ?? participants().length }} of
+          {{ groupStatus()?.maxCapacity ?? groupInvite.MaxGuestCount }} guests</span>
+      </div>
+
+      @if (lastUpdated(); as updatedAt) {
+        <div class="sync-controls">
+          <span>Updated at {{ updatedAt | date: 'HH:mm:ss' }}</span>
+          <button type="button" class="text-button" [disabled]="isRefreshing()" (click)="refreshNow()">
+            Refresh
+          </button>
+        </div>
+      }
+
+      @if (refreshFailed()) {
+        <p class="refresh-warning" role="status">
+          Couldn’t refresh. Showing data from {{ lastUpdated() | date: 'HH:mm:ss' }}.
+        </p>
+      }
+    </header>
+
+    @if (pendingParticipants().length > 0) {
+      <aside class="pending-banner" role="status">
+        {{ pendingParticipants().length }}
+        {{ pendingParticipants().length === 1 ? 'participant hasn’t' : 'participants haven’t' }}
+        submitted their cart yet — their dishes won’t be included in the order.
+      </aside>
+    }
+
+    @if (hasNoDishes()) {
+      <p class="empty-message">Participants haven't added any dishes yet</p>
+    }
+
+    <ul class="participants">
+      @for (person of participants(); track person.id) {
+        <li>
+          <app-participant-card
+            [participant]="person"
+            [isMe]="person.id === ownerSessionId()"
+            [canRemove]="groupStatus()?.status === 'Open'"
+            (removeClick)="openRemoveGuestDialog($event)"
+          />
+        </li>
+      }
+    </ul>
+
+    <section class="consolidated-order" aria-labelledby="consolidated-heading">
+      <h2 id="consolidated-heading">Consolidated Pre-Order</h2>
+      @if (consolidatedOrder().items.length > 0) {
+        <ul class="consolidated-items">
+          @for (item of consolidatedOrder().items; track item.dish.id) {
+            <li>
+              <span>{{ item.dish.name }} × {{ item.quantity }}</span>
+              <span>{{ item.dish.price * item.quantity | currency }}</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p>No submitted dishes to include.</p>
+      }
+      <p class="grand-total">
+        <span>Grand Total</span>
+        <span>{{ consolidatedOrder().total | currency }}</span>
+      </p>
+
+      @if (groupStatus()?.status === 'Open') {
+        <button
+          class="button button--primary submit-button"
+          type="button"
+          [disabled]="!canSubmit()"
+          (click)="openSubmitDialog()"
+        >
+          Submit Pre-Order
+        </button>
+      }
+    </section>
+  </main>
+}
+
+@if (isSubmitDialogOpen()) {
+  <app-modal title="Submit Pre-Order" (closed)="closeSubmitDialog()">
+    <p>Submit the consolidated pre-order to the restaurant?</p>
+    <div modal-actions>
+      <button class="text-button" type="button" [disabled]="isSubmitting()" (click)="closeSubmitDialog()">
+        Cancel
+      </button>
+      <button
+        class="button button--primary"
+        type="button"
+        [disabled]="isSubmitting()"
+        (click)="submitPreOrder()"
+      >
+        {{ isSubmitting() ? 'Submitting…' : 'Submit' }}
+      </button>
+    </div>
+  </app-modal>
+}
+
+@if (selectedGuest(); as guest) {
+  <app-modal title="Remove Guest" (closed)="closeRemoveGuestDialog()">
+    <p>
+      Are you sure you want to remove <strong>{{ guest.name }}</strong> and their pre-order from this
+      reservation? This action cannot be undone.
+    </p>
+    <div modal-actions>
+      <button class="text-button" type="button" [disabled]="isRemovingGuest()" (click)="closeRemoveGuestDialog()">
+        Cancel
+      </button>
+      <button
+        class="button button--danger"
+        type="button"
+        [disabled]="isRemovingGuest()"
+        (click)="removeGuest()"
+      >
+        Remove Guest
+      </button>
+    </div>
+  </app-modal>
+}

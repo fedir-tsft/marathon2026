@@ -20,6 +20,8 @@ node_modules/
 .env.*
 /homework-backend (2).md
 /README (2).md
+/frontend/practice-frontend copy.md
+/frontend/homework-frontend copy.md
 
 # Generated backend artifacts
 **/bin/

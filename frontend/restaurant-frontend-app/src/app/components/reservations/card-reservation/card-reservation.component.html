@@ -169,6 +169,16 @@
           >
             Pre-order
           </button>
+
+          @if (canOpenGroupOrder()) {
+            <button
+              type="button"
+              class="button button--secondary button--large"
+              (click)="onGroupOrder()"
+            >
+              Group Order
+            </button>
+          }
         }
       }
 

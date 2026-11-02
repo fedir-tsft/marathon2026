@@ -1,3 +1,15 @@
-﻿namespace APIHandler.Models.GroupReservation;
+﻿using System;
 
-public record GetGroupInviteTokenResponse(string Token);
+namespace APIHandler.Models.GroupReservation;
+
+public record GetGroupInviteTokenResponse(
+    string Token,
+    string GroupReservationId,
+    string LocationId,
+    string RestaurantName,
+    string LocationAddress,
+    DateTime StartTime,
+    DateTime EndTime,
+    int MaxGuestCount,
+    int TableNumber,
+    string InviterName);

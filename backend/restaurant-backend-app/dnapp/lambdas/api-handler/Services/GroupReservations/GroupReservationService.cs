@@ -132,10 +132,13 @@ public class GroupReservationService(
         await groupReservationRepository.SaveGroupReservationAsync(groupReservation);
     }
 
-    public async Task<GetGroupInviteTokenResponse> GetGroupReservationInviteTokenAsync(string reservationId)
+    public async Task<GetGroupInviteTokenResponse> GetGroupReservationInviteTokenAsync(string userId, string reservationId)
     {
         var reservation = await reservationRepository.GetReservationByIdAsync(reservationId)
             ?? throw new ReservationNotFoundException($"Reservation {reservationId} was not found.");
+
+        if (!string.Equals(reservation.CustomerId, userId, StringComparison.OrdinalIgnoreCase))
+            throw new ActionForbiddenException("Only the reservation owner can retrieve the invitation.");
 
         if (reservation.GuestCount < 2)
             throw new ValidationException("Retrieving invitation token for the reservation with only one guest is not permitted.");
@@ -143,7 +146,8 @@ public class GroupReservationService(
         if (reservation.Status != ReservationStatus.Reserved)
             throw new GroupReservationExpiredException("The group reservation is expired.");
 
-        GroupReservation groupReservation = (await groupReservationRepository.GetByReservationIdAsync(reservationId))!;
+        GroupReservation groupReservation = await groupReservationRepository.GetByReservationIdAsync(reservationId)
+            ?? throw new GroupReservationNotFoundException();
 
         if (groupReservation.Status == GroupReservationStatus.Submitted)
             throw new GroupReservationSubmittedException();
@@ -151,7 +155,24 @@ public class GroupReservationService(
         if (groupReservation.Status == GroupReservationStatus.Closed)
             throw new GroupReservationExpiredException();
 
-        return new GetGroupInviteTokenResponse(groupReservation.ReservationToken);
+        Table table = await tableRepository.GetTableAsync(reservation.TableId)
+            ?? throw new InvalidOperationException("Associated table not found.");
+        Location? location = await locationService.GetLocationByIdAsync(table.LocationId);
+        string inviterName = string.IsNullOrWhiteSpace(reservation.CustomerId)
+            ? "Unknown"
+            : await userService.GetUserName(reservation.CustomerId) ?? "Unknown";
+
+        return new GetGroupInviteTokenResponse(
+            groupReservation.ReservationToken,
+            groupReservation.GroupReservationId,
+            table.LocationId,
+            DefaultRestaurantName,
+            location?.Address ?? "Unknown Address",
+            reservation.StartTime,
+            reservation.EndTime,
+            reservation.GuestCount,
+            table.TableNumber,
+            inviterName);
     }
 
     public async Task<List<SubmittedGroupDishResponse>> SubmitGroupPreOrderAsync(
