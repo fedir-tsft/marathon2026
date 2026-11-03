@@ -10,10 +10,20 @@ import { GroupOrderApi } from '../support/api/group-order-api';
 import { GroupOrderPage } from '../support/page-objects/group-order-page';
 import { LoginPage } from '../support/page-objects/login-page';
 
+function requireConfig(isConfigured: boolean, missingConfigMessage: string): void {
+  if (isConfigured) return;
+
+  if (process.env.CODEBUILD_BUILD_ID) {
+    throw new Error(`CodeBuild test configuration is incomplete: ${missingConfigMessage}`);
+  }
+
+  test.skip(true, missingConfigMessage);
+}
+
 test.describe('Track 1 — Group Pre-Order', () => {
   test('@level1 @ui owner can view the group order page', async ({ page }) => {
-    test.skip(
-      !hasViewUiConfig,
+    requireConfig(
+      hasViewUiConfig,
       'Configure FRONTEND_URL, TEST_VIEW_RESERVATION_ID, OWNER_EMAIL and OWNER_PASSWORD.'
     );
 
@@ -28,8 +38,8 @@ test.describe('Track 1 — Group Pre-Order', () => {
   });
 
   test('@level2 @ui owner can submit the consolidated pre-order', async ({ page }) => {
-    test.skip(
-      !hasSubmitUiConfig,
+    requireConfig(
+      hasSubmitUiConfig,
       'Configure FRONTEND_URL, TEST_SUBMIT_RESERVATION_ID, OWNER_EMAIL and OWNER_PASSWORD.'
     );
 
@@ -43,8 +53,8 @@ test.describe('Track 1 — Group Pre-Order', () => {
   });
 
   test('@level2 @api non-owner cannot submit the group pre-order', async ({ request }) => {
-    test.skip(
-      !hasNonOwnerApiConfig,
+    requireConfig(
+      hasNonOwnerApiConfig,
       'Configure API_BASE_URL, the forbidden test reservation/group IDs, and guest credentials.'
     );
 
@@ -60,7 +70,10 @@ test.describe('Track 1 — Group Pre-Order', () => {
   });
 
   test('@level1 @api empty group returns an empty participants list and total 0', async ({ request }) => {
-    test.skip(!hasEmptyGroupConfig, 'Configure API_BASE_URL, EMPTY_GROUP_RESERVATION_ID and owner credentials.');
+    requireConfig(
+      hasEmptyGroupConfig,
+      'Configure API_BASE_URL, EMPTY_GROUP_RESERVATION_ID and owner credentials.'
+    );
 
     const api = new GroupOrderApi(request, config.apiBaseUrl);
     const ownerToken = await api.signIn(config.ownerEmail, config.ownerPassword);
