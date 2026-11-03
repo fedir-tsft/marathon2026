@@ -1,5 +1,5 @@
-<testsuites id="" name="" tests="4" failures="0" skipped="4" errors="0" time="0.16426700000000005">
-<testsuite name="track1\group-preorder.spec.ts" timestamp="2026-11-03T15:55:12.910Z" hostname="chromium" tests="4" failures="0" skipped="4" time="0" errors="0">
+<testsuites id="" name="" tests="4" failures="0" skipped="4" errors="0" time="0.08390100000000007">
+<testsuite name="track1\group-preorder.spec.ts" timestamp="2026-11-03T18:39:29.710Z" hostname="chromium" tests="4" failures="0" skipped="4" time="0" errors="0">
 <testcase name="Track 1 — Group Pre-Order › @level1 @ui owner can view the group order page" classname="track1\group-preorder.spec.ts">
 <skipped>
 </skipped>

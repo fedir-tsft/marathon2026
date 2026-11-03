@@ -5,28 +5,25 @@ phases:
     runtime-versions:
       nodejs: 22
     commands:
-      - npm ci
-      - npx playwright install --with-deps chromium
+      - cd "$CODEBUILD_SRC_DIR/aqa/restaurant-aqa-framework" && npm ci
+      - cd "$CODEBUILD_SRC_DIR/aqa/restaurant-aqa-framework" && npx playwright install --with-deps chromium
   pre_build:
     commands:
-      - mkdir -p test-results
-      - npm run typecheck
+      - cd "$CODEBUILD_SRC_DIR/aqa/restaurant-aqa-framework" && mkdir -p test-results
+      - cd "$CODEBUILD_SRC_DIR/aqa/restaurant-aqa-framework" && npm run typecheck
   build:
     commands:
-      - set +e; npx playwright test; test_status=$?; echo "$test_status" > test-results/exit-code.txt; exit 0
-  post_build:
-    commands:
-      - test_status=$(cat test-results/exit-code.txt); if [ "$test_status" -ne 0 ]; then echo "Playwright tests failed with exit code $test_status"; exit "$test_status"; fi
+      - cd "$CODEBUILD_SRC_DIR/aqa/restaurant-aqa-framework" && npx playwright test
 
 reports:
   restaurant-aqa-junit:
     files:
       - junit.xml
-    base-directory: test-results
+    base-directory: aqa/restaurant-aqa-framework/test-results
     file-format: JUNITXML
 
 artifacts:
   files:
-    - playwright-report/**/*
-    - test-results/**/*
+    - aqa/restaurant-aqa-framework/playwright-report/**/*
+    - aqa/restaurant-aqa-framework/test-results/**/*
   discard-paths: no
