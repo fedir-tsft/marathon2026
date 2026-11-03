@@ -1,0 +1,7 @@
+aws_region           = "eu-north-1"
+repository_owner     = "your-github-owner"
+repository_name      = "your-public-repository"
+repository_branch    = "main"
+github_connection_arn = "arn:aws:codeconnections:eu-north-1:123456789012:connection/replace-me"
+artifact_bucket_name = "unique-restaurant-aqa-artifact-bucket-name"
+qa_secrets_arn       = "arn:aws:secretsmanager:eu-north-1:123456789012:secret:restaurant-aqa-config-replace-me"

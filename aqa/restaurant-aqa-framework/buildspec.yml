@@ -1,0 +1,32 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - npm ci
+      - npx playwright install --with-deps chromium
+  pre_build:
+    commands:
+      - mkdir -p test-results
+      - npm run typecheck
+  build:
+    commands:
+      - set +e; npx playwright test; test_status=$?; echo "$test_status" > test-results/exit-code.txt; exit 0
+  post_build:
+    commands:
+      - test_status=$(cat test-results/exit-code.txt); if [ "$test_status" -ne 0 ]; then echo "Playwright tests failed with exit code $test_status"; exit "$test_status"; fi
+
+reports:
+  restaurant-aqa-junit:
+    files:
+      - junit.xml
+    base-directory: test-results
+    file-format: JUNITXML
+
+artifacts:
+  files:
+    - playwright-report/**/*
+    - test-results/**/*
+  discard-paths: no
