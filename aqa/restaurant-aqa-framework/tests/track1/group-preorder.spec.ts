@@ -7,8 +7,8 @@ import {
   hasViewUiConfig,
 } from '../config';
 import { GroupOrderApi } from '../support/api/group-order-api';
+import { GroupOrderSetup } from '../support/group-order-setup';
 import { GroupOrderPage } from '../support/page-objects/group-order-page';
-import { LoginPage } from '../support/page-objects/login-page';
 
 function requireConfig(isConfigured: boolean, missingConfigMessage: string): void {
   if (isConfigured) return;
@@ -21,35 +21,46 @@ function requireConfig(isConfigured: boolean, missingConfigMessage: string): voi
 }
 
 test.describe('Track 1 — Group Pre-Order', () => {
-  test('@level1 @ui owner can view the group order page', async ({ page }) => {
+  test('@level1 @ui owner can view the group order page', async ({ page, browser, request }) => {
     requireConfig(
       hasViewUiConfig,
-      'Configure FRONTEND_URL, TEST_VIEW_RESERVATION_ID, OWNER_EMAIL and OWNER_PASSWORD.'
+      'Configure FRONTEND_URL, API_BASE_URL, OWNER_EMAIL and OWNER_PASSWORD.'
     );
 
-    const loginPage = new LoginPage(page);
-    await loginPage.open();
-    await loginPage.signIn(config.ownerEmail, config.ownerPassword);
-
-    const groupOrderPage = new GroupOrderPage(page);
-    await groupOrderPage.open(config.viewReservationId);
-    await groupOrderPage.expectHeader();
-    await groupOrderPage.expectParticipantsList();
+    const setup = new GroupOrderSetup(page, browser, request, config.apiBaseUrl);
+    try {
+      const group = await setup.create(
+        config.ownerEmail,
+        config.ownerPassword
+      );
+      const groupOrderPage = new GroupOrderPage(page);
+      await groupOrderPage.open(group.reservationId);
+      await groupOrderPage.expectHeader();
+      await groupOrderPage.expectGuestOrder(group.guestName, group.dishNames);
+    } finally {
+      await setup.cleanup();
+    }
   });
 
-  test('@level2 @ui owner can submit the consolidated pre-order', async ({ page }) => {
+  test('@level2 @ui owner can submit the consolidated pre-order', async ({ page, browser, request }) => {
     requireConfig(
       hasSubmitUiConfig,
-      'Configure FRONTEND_URL, TEST_SUBMIT_RESERVATION_ID, OWNER_EMAIL and OWNER_PASSWORD.'
+      'Configure FRONTEND_URL, API_BASE_URL, OWNER_EMAIL and OWNER_PASSWORD.'
     );
 
-    const loginPage = new LoginPage(page);
-    await loginPage.open();
-    await loginPage.signIn(config.ownerEmail, config.ownerPassword);
-
-    const groupOrderPage = new GroupOrderPage(page);
-    await groupOrderPage.open(config.submitReservationId);
-    await groupOrderPage.submitPreOrder();
+    const setup = new GroupOrderSetup(page, browser, request, config.apiBaseUrl);
+    try {
+      const group = await setup.create(
+        config.ownerEmail,
+        config.ownerPassword
+      );
+      const groupOrderPage = new GroupOrderPage(page);
+      await groupOrderPage.open(group.reservationId);
+      await groupOrderPage.expectGuestOrder(group.guestName, group.dishNames);
+      await groupOrderPage.submitPreOrder();
+    } finally {
+      await setup.cleanup();
+    }
   });
 
   test('@level2 @api non-owner cannot submit the group pre-order', async ({ request }) => {

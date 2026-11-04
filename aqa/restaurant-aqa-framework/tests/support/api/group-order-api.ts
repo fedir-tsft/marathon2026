@@ -83,4 +83,17 @@ export class GroupOrderApi {
       ok: response.ok(),
     };
   }
+
+  async cancelReservation(reservationId: string, token: string): Promise<void> {
+    const response = await this.request.delete(`${this.apiBaseUrl}/reservations`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: { id: reservationId },
+    });
+
+    if (!response.ok()) {
+      throw new Error(
+        `DELETE /reservations failed with ${response.status()}: ${await response.text()}`
+      );
+    }
+  }
 }

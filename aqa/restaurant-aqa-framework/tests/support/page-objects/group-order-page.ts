@@ -16,6 +16,15 @@ export class GroupOrderPage {
     expect(await this.page.locator('app-participant-card').count()).toBeGreaterThan(0);
   }
 
+  async expectGuestOrder(guestName: string, dishNames: string[]): Promise<void> {
+    const guestCard = this.page.locator('app-participant-card').filter({ hasText: guestName });
+    await expect(guestCard).toBeVisible();
+    for (const dishName of dishNames) {
+      await expect(guestCard).toContainText(dishName);
+    }
+    await expect(guestCard).toContainText('Submitted');
+  }
+
   async submitPreOrder(): Promise<void> {
     const submitButton = this.page.getByRole('button', { name: /submit pre-order|submit|send to restaurant/i });
     await expect(submitButton).toBeVisible();

@@ -7,7 +7,7 @@ Track 1: Playwright + TypeScript, using a Page Object Model for UI interactions 
 ## Local setup
 
 1. Copy `.env.example` to `.env`.
-2. Set valid frontend/API URLs, owner and guest test credentials, and separate IDs for view, submit, forbidden-submit, and empty-group test data. Use dedicated test data only.
+2. Set valid frontend/API URLs and owner credentials. The UI tests create a new reservation and guest order for each run. The API authorization and empty-group tests still require their dedicated reservation/group IDs and guest credentials. Use dedicated test accounts and data only.
 3. Install packages and the Chromium browser:
 
 ```powershell
@@ -30,11 +30,11 @@ npm run test:level3
 
 Playwright produces an HTML report at `playwright-report/index.html`, a JUnit report at `test-results/junit.xml`, and failure traces/screenshots/videos under `test-results`. View the HTML report with `npm run report`.
 
-The current tests are a scaffold, not complete assignment coverage: they exercise owner viewing/submission, a non-owner submit attempt, and an empty-group response. Level 3 has no tests yet, and further Level 1/2 positive and negative scenarios must be added.
+The UI tests sign in as the owner, choose a dynamically generated future date and available table for two people, create a reservation, retrieve its invite link, open it in a separate browser context, and submit two available guest dishes. One test verifies the owner’s group-order view; another submits the consolidated order. Each UI test cancels the reservation through the API in cleanup. The API authorization and empty-group tests still use dedicated IDs. This is not complete assignment coverage: Level 3 has no tests yet, and further Level 1/2 positive and negative scenarios must be added.
 
 ## Test data and behavior
 
-Use separate, dedicated groups for viewing, submission, authorization, and the empty-group case. The submission UI test changes the group status, so do not point it at customer data or reuse its reservation for another test. Separate IDs prevent these tests from mutating one another when run in parallel. Test data setup/cleanup is not automated yet; the current IDs must be prepared for each run, and the submission group must be replaced after it is submitted. The app has no hard-delete cleanup API for reservations. This is a known gap against the assignment's unique-per-run data and cleanup requirements.
+Each UI test creates a fresh reservation and group, so the two UI flows do not reuse mutable group state. Reservation cancellation is performed during cleanup; the application does not provide hard-delete cleanup for reservations. The API tests use their own configured data and are not changed by the UI workflow.
 
 The assignment leaves repeated submission and non-owner behavior unspecified. This scaffold currently accepts HTTP 400, 401, 403, or 404 for the non-owner attempt. Choose and document the application's actual expected behavior before treating that assertion as final.
 

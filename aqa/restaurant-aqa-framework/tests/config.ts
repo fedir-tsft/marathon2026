@@ -5,8 +5,6 @@ dotenv.config();
 export const config = {
   frontendUrl: process.env.FRONTEND_URL ?? '',
   apiBaseUrl: process.env.API_BASE_URL ?? '',
-  viewReservationId: process.env.TEST_VIEW_RESERVATION_ID ?? '',
-  submitReservationId: process.env.TEST_SUBMIT_RESERVATION_ID ?? '',
   forbiddenReservationId: process.env.TEST_FORBIDDEN_RESERVATION_ID ?? '',
   forbiddenGroupReservationId: process.env.TEST_FORBIDDEN_GROUP_RESERVATION_ID ?? '',
   emptyGroupReservationId: process.env.EMPTY_GROUP_RESERVATION_ID ?? '',
@@ -27,14 +25,14 @@ function isHttpUrl(value: string): boolean {
 
 export const hasViewUiConfig = Boolean(
   isHttpUrl(config.frontendUrl) &&
-    config.viewReservationId &&
+    isHttpUrl(config.apiBaseUrl) &&
     config.ownerEmail &&
     config.ownerPassword
 );
 
 export const hasSubmitUiConfig = Boolean(
   isHttpUrl(config.frontendUrl) &&
-    config.submitReservationId &&
+    isHttpUrl(config.apiBaseUrl) &&
     config.ownerEmail &&
     config.ownerPassword
 );
